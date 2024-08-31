@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit'
 import commonReducer from "../features/common/CommonSlice"
 import { setupListeners } from '@reduxjs/toolkit/query/react'
-import { authTokenApi } from "../api/gapi"
+import { authTokenApi } from "../api/googleApi"
 
 export const store = configureStore({
   reducer: {

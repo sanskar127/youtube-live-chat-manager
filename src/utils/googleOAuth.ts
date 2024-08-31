@@ -59,7 +59,7 @@
 //   console.log(data)
 // }
 
-interface ApiInterface {
+interface AuthCodeInterface {
   (params: {
     client_id: string,
     redirect_uri: string,
@@ -68,7 +68,7 @@ interface ApiInterface {
   }): Promise<string | null>,
 }
 
-export const getGoogleAuthCode: ApiInterface = ({ client_id, redirect_uri, response_type, scope }) => {
+export const getGoogleAuthCode: AuthCodeInterface = ({ client_id, redirect_uri, response_type, scope }) => {
   const baseUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
 
   const authUrl = `${baseUrl}?client_id=${client_id}&redirect_uri=${encodeURIComponent(redirect_uri)}&response_type=${response_type}&scope=${encodeURIComponent(scope)}&include_granted_scopes=true`;
