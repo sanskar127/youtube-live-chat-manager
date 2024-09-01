@@ -1,20 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-
-interface ResponseType {
-    access_token: string;
-    expires_in: number;
-    id_token: string;
-    scope: string;
-    token_type: string;
-    refresh_token: string; // optional
-}
-
-interface parametersType {
-    auth_code: string;
-    client_id: string;
-    client_secret: string;
-    redirect_uri: string;
-}
+import { AccessTokenResponse, parametersType } from '../types/authToken'
 
 // Define a service using a base URL and expected endpoints
 export const authTokenApi = createApi({
@@ -24,7 +9,7 @@ export const authTokenApi = createApi({
     }),
     // url: '/token',
     endpoints: (builder) => ({
-        fetchAccessToken: builder.mutation<ResponseType, parametersType>({
+        fetchAccessToken: builder.mutation<AccessTokenResponse, parametersType>({
             query: ({auth_code, client_id, client_secret, redirect_uri}) => ({
                 url: '/token',
                 method: 'POST',

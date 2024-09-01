@@ -1,29 +1,45 @@
-import { useState } from "react"
-import { useFetchAccessTokenMutation } from "../api/googleApi"
+import { useEffect, useState } from "react"
+import { accessTokenParamsType, authCodeParamsType, useAuthTokenType } from "../types/authToken"
 import { getGoogleAuthCode } from "../utils/googleOAuth"
+import { useFetchAccessTokenMutation } from "../api/googleApi"
 
-const UseAuthToken: React.FC = () => {
-    const [fetchAccessToken, { isLoading, data, error }] = useFetchAccessTokenMutation()
-
+export const useAuthToken = () => {
+    // State Hook to store auth code received from getGoogleAuthCode Promise
     const [authCode, setAuthCode] = useState<string>("")
 
-    const authCodeParams = {
-        client_id: import.meta.env.VITE_CLIENT_ID,
-        redirect_uri: `${window.location.origin}/auth/callback`,
-        response_type: 'code',
-        scope: 'profile email',
-    }
-    
-    const accessTokenParams = {
-        auth_code: authCode,
-        client_id: import.meta.env.VITE_CLIENT_ID,
-        client_secret: import.meta.env.VITE_CLIENT_SECRET,
-        redirect_uri: `${window.location.origin}/auth/callback`
+    useEffect(() => {
+        // Parameters passed to receive the Authorization code from google api for mentioned scopes
+        const authCodeParams: authCodeParamsType = {
+            client_id: import.meta.env.VITE_CLIENT_ID,
+            redirect_uri: `${window.location.origin}/auth/callback`,
+            scope: 'profile email',
+        }
+        // This Function returns a Promise to receive auth code
+        getGoogleAuthCode(authCodeParams)
+            .then((code) => setAuthCode(code))
+            .catch((error: Error) => console.log(error))
+
+    }, [])
+
+
+    const [fetchAccessToken, { data, isSuccess, error, isLoading }] = useFetchAccessTokenMutation();
+
+    useEffect(() => {
+        const accessTokenParams: accessTokenParamsType = {
+            client_id: import.meta.env.VITE_CLIENT_ID,
+            redirect_uri: `${window.location.origin}/auth/callback`,
+            auth_code: authCode,
+            client_secret: import.meta.env.VITE_CLIENT_SECRET,
+        }
+
+        fetchAccessToken(accessTokenParams)
+    }, [authCode, fetchAccessToken])
+
+    const handleAuthToken = (): void => {
+        if (isSuccess) {
+            console.log(data)
+        }
     }
 
-    getGoogleAuthCode(authCodeParams)
-        .then((data) => setAuthCode(data))
-        .catch(error => console.log(error))
-}
-
-export { UseAuthToken }
+    return { handleAuthToken, isLoading, error }
+} 
